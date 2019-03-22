@@ -1,0 +1,17 @@
+{
+  "name": "login",
+  "version": "0.0.1",
+  "description": "Login Id",
+  "main": "Login.js",
+  "dependencies": {
+    "express": "latest",
+    "body-parser": "latest",
+    "express-session": "latest",
+    "mysql": "latest"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zenouzi",
+  "license": "ISC"
+}
