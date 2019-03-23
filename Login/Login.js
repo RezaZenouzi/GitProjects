@@ -9,6 +9,7 @@ app.use(express.static(__dirname+"/static"));
 app.use(bodyParser());
 app.use(session({secret:"reza"}));
 
+                                        // Connect to database
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -19,27 +20,18 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err)
     {
-        console.log("errorrrrrrrrrr is : "+err.toString());
+        console.log("error is : "+err.toString());
     }
    console.log("connected")
 });
-connection.query(
-    "Select * From users",function (err,result,fields) {
-        if (err)
-        {
-            console.log("error is : "+err.toString());
-        }
-        console.log(result);
-    }
-);
-connection.end();
 
-var users = {"reza":"1234","ali":"5678"};
-
+                                        // It is method for index page
 app.get('/',function (req,res,next) {
    console.log("index page");
    res.sendFile(__dirname+"/static/index.html")
 });
+
+                                        // It is the method for log in page
 app.get("/logIn",function (req,res,next) {
     if (req.session.user != undefined)
     {
@@ -50,33 +42,13 @@ app.get("/logIn",function (req,res,next) {
         res.send("Please Sign Up First ...");
     }
 });
-app.post('/signIn',function (req,res,next) {
-    console.log(req.body);
-  /*  for (user in users)
-    {
-        if (req.body["name"] == user)
-        {
-            if (req.body["pass"] == users[user])
-            {
-                req.session.user = req.body["name"] ;
-                res.send("true");
-                console.log(req.session);
-                return;
-            }
-            else
-            {
-                res.send("Password Is Wrong ! ");
-                return;
-            }
-        }
-    }
-    res.send("User Could Not Found ! ");*/
 
-  var name = req.body.name;
+                                        // It is the method for sign in the user
+app.post('/signIn',function (req,res,next) {
+  var name = req.body.name.toString();
   var pass = req.body.pass;
 
-    connection.query(
-        "Select * From users Where Name = ?",[name],function (err,result,fields) {
+    connection.query("SELECT * FROM users WHERE Name = ? And Password = ?",[name,pass],function (err,result,fields) {
             if (err)
             {
                 console.log("error is : "+err.toString());
@@ -85,30 +57,25 @@ app.post('/signIn',function (req,res,next) {
             {
                 if (result.length > 0)
                 {
-                    if (result[0].password == pass)
-                    {
-                        res.send("log in")
-                    }
-                    else
-                    {
-                        res.send("password ")
-                    }
+                    req.session.user = name ;
+                    res.send("true");
                 }
                 else
                 {
-                    res.send("username")
+                    res.send("Username Or Password Is Wrong !")
                 }
             }
         }
     );
 
 });
+
+                                            // It is the method for sign out the user
 app.post('/signOut',function (req,res,next) {
     if (req.session.user != undefined)
     {
-        req.session.user = "";
+        req.session.user = undefined;
         res.send("true");
-        return;
     }
     else
     {
@@ -116,6 +83,21 @@ app.post('/signOut',function (req,res,next) {
     }
 });
 
+                                            // It is the method list page
+app.get('/list', (req, res) => {
+    res.sendFile(__dirname+"/static/list.html");
+});
+
+
+                                            // It is the method for edit username
+app.post('/edit',function (req,res,next) {
+    var id = req.body.id;
+    var newName = req.body.newName;
+    console.log(id);
+    console.log(newName);
+    connection.query('UPDATE users SET Name = ? WHERE Id = ?', [newName, id]);
+    res.send("Updated !");
+});
 
 app.listen(8000);
 console.log("server run !");

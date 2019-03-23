@@ -31,4 +31,29 @@ $(document).ready(function () {
             }
         })
     });
+
+
+    $("#back").click(function () {
+                var url = "/";
+                window.open(url, "_blank");
+    });
+
+
+    $("#list").click(function () {
+        var url = "/list";
+        window.open(url, "_blank");
+    });
+
+
+    $(".btn-edit").click(function () {
+        debugger;
+        var id = $(this).attr("id");
+        var newName = $(".input-name").val();
+        $.post("/edit",{id:id,newName:newName},function (data) {
+
+                alert(data.toString());
+        })
+    });
+
+
 })
